@@ -16,4 +16,10 @@ public class WebUtil {
 	    		request.getRequestDispatcher(path);
 	    rd.forward(request, response);
 	}
+	public static Long checkParameter(String value, Long defaultValue) {
+		return defaultValue;
+	}
+	public static String checkParameter(String value, String defaultValue) {
+		return defaultValue;
+	}
 }

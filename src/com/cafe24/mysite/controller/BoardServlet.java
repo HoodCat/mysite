@@ -7,22 +7,23 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.cafe24.action.guestbook.GuestBookActionFactory;
+import com.cafe24.action.board.BoardActionFactory;
 import com.cafe24.mvc.action.Action;
 
 /**
- * Servlet implementation class GuestBookServlet
+ * Servlet implementation class BoardServlet
  */
-@WebServlet("/guestbook")
-public class GuestBookServlet extends HttpServlet {
+@WebServlet("/board")
+public class BoardServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String actionName = request.getParameter("a");
-		Action action = new GuestBookActionFactory().getAction(actionName);
+		Action action = new BoardActionFactory().getAction(actionName);
 		action.execute(request, response);
 	}
+
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
 		doGet(request, response);
 	}
 

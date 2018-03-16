@@ -1,4 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -8,16 +11,7 @@
 </head>
 <body>
 	<div id="container">
-		<div id="header">
-			<h1>MySite</h1>
-			<ul>
-				<li><a href="">로그인</a><li>
-				<li><a href="">회원가입</a><li>
-				<li><a href="">회원정보수정</a><li>
-				<li><a href="">로그아웃</a><li>
-				<li>님 안녕하세요 ^^;</li>
-			</ul>
-		</div>
+		<c:import url="/WEB-INF/views/includes/header.jsp"/>
 		<div id="content">
 			<div id="board">
 				<form id="search_form" action="" method="post">
@@ -32,31 +26,28 @@
 						<th>조회수</th>
 						<th>작성일</th>
 						<th>&nbsp;</th>
-					</tr>				
-					<tr>
-						<td>3</td>
-						<td><a href="">세 번째 글입니다.</a></td>
-						<td>안대혁</td>
-						<td>3</td>
-						<td>2015-10-11 12:04:20</td>
-						<td><a href="" class="del">삭제</a></td>
 					</tr>
-					<tr>
-						<td>2</td>
-						<td><a href="">두 번째 글입니다.</a></td>
-						<td>안대혁</td>
-						<td>3</td>
-						<td>2015-10-02 12:04:12</td>
-						<td><a href="" class="del">삭제</a></td>
-					</tr>
-					<tr>
-						<td>1</td>
-						<td><a href="">첫 번째 글입니다.</a></td>
-						<td>안대혁</td>
-						<td>3</td>
-						<td>2015-09-25 07:24:32</td>
-						<td><a href="" class="del">삭제</a></td>
-					</tr>
+					
+					<c:forEach items="${mapList}" var="entrys" varStatus="status">
+					    <c:forEach items="${entrys}" var="entry">
+							<tr>
+								<td>${status.index}</td>
+								<td style="text-align:left">
+								<c:if test="${entry.value.depth > 0}]">
+								  <td style="text-align:left; padding-bottom:${20*entry.value.depth}">
+								  <img src="/mysite/assets/images/reply.png"/>
+								</c:if>
+								  <a href="/mysite/board?a=view&no=${entry.value.no}">${entry.value.title}</a>
+							    </td>
+								<td>${entry.key}</td>
+								<td>${entry.value.views}</td>
+								<td>${entry.value.regDate}</td>
+								<c:if test="${not empty authUser and entry.value.userNo == authUser.no}">
+									<td><a href="/mysite/board?a=delete&no=${entry.value.no}" class="del">삭제</a></td>
+								</c:if>
+							</tr>					
+					    </c:forEach>
+					</c:forEach>				
 				</table>
 				<div class="pager">
 					<ul>
@@ -68,22 +59,18 @@
 						<li>5</li>
 						<li><a href="">▶</a></li>
 					</ul>
-				</div>				
-				<div class="bottom">
-					<a href="" id="new-book">글쓰기</a>
-				</div>				
+				</div>
+				<c:if test="${not empty authUser}">
+					<div class="bottom">
+						<a href="/mysite/board?a=writeform" id="new-book">글쓰기</a>
+					</div>				
+				</c:if>				
 			</div>
 		</div>
-		<div id="navigation">
-			<ul>
-				<li><a href="">안대혁</a></li>
-				<li><a href="">방명록</a></li>
-				<li><a href="">게시판</a></li>
-			</ul>
-		</div>
-		<div id="footer">
-			<p>(c)opyright 2014 </p>
-		</div>
+		<c:import url="/WEB-INF/views/includes/navigation.jsp">
+		    <c:param name="menu" value="board"></c:param>
+		</c:import>
+		<c:import url="/WEB-INF/views/includes/footer.jsp"/>
 	</div>
 </body>
 </html>

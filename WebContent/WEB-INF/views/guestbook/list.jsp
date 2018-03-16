@@ -1,9 +1,11 @@
 <%@page import="com.cafe24.mysite.vo.GuestBookVo"%>
 <%@page import="java.util.List"%>
 <%@ page contentType="text/html;charset=UTF-8" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%
-    List<GuestBookVo> list = (List<GuestBookVo>)request.getAttribute("list");
-    int size = (int)request.getAttribute("size");
+    pageContext.setAttribute("newLine", "\n");
 %>
 <!doctype html>
 <html>
@@ -14,7 +16,7 @@
 </head>
 <body>
 	<div id="container">
-		<jsp:include page="/WEB-INF/views/includes/header.jsp"/>
+	    <c:import url="/WEB-INF/views/includes/header.jsp"/>
 		<div id="content">
 			<div id="guestbook">
 				<form action="/mysite/guestbook" method="post">
@@ -34,28 +36,31 @@
 				</form>
 				<ul>
 					<li>
-						<%for(GuestBookVo vo: list) { %>
+					<c:set var="count" value='${fn:length(list)}'/>
+					<c:forEach items='${list}' var="vo" varStatus="status">
 							<table>
 								<tr>
-									<td>[<%=size %>]</td>
-									<td><%=vo.getName() %></td>
-									<td><%=vo.getRegDate() %></td>
-									<td><a href="/mysite/guestbook?a=deleteform&no=<%= vo.getNo() %>">삭제</a></td>
+									<td>[${count - status.index}]</td>
+									<td>${vo.name}</td>
+									<td>${vo.regDate}</td>
+									<td><a href="/mysite/guestbook?a=deleteform&no=${vo.no}">삭제</a></td>
 								</tr>
 								<tr>
 									<td colspan=4>
-									<%=vo.getContent().replaceAll("\n", "<br/>") %>	
+									${fn:replace(vo.content, newLine, "<br/>")}
 									</td>
 								</tr>
 							</table>
-							<br>
-						<%size--;}%>
+							<br>					
+					</c:forEach>
 					</li>
 				</ul>
 			</div>
 		</div>
-		<jsp:include page="/WEB-INF/views/includes/navigation.jsp"/>
-		<jsp:include page="/WEB-INF/views/includes/footer.jsp"/>
+		<c:import url="/WEB-INF/views/includes/navigation.jsp">
+		    <c:param name="menu" value="guestbook"></c:param>
+		</c:import>
+		<c:import url="/WEB-INF/views/includes/footer.jsp"/>
 	</div>
 </body>
 </html>
