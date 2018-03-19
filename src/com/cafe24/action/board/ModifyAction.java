@@ -9,8 +9,10 @@ import javax.servlet.http.HttpSession;
 
 import com.cafe24.mvc.action.Action;
 import com.cafe24.mvc.util.WebUtil;
+import com.cafe24.mysite.dao.BoardDao;
+import com.cafe24.mysite.vo.BoardVo;
 
-public class WriteFormAction implements Action {
+public class ModifyAction implements Action {
 
 	@Override
 	public void execute(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -19,8 +21,18 @@ public class WriteFormAction implements Action {
 			WebUtil.redirect(request, response, "/mysite/board");
 			return;
 		}
-		request.setAttribute("isReply", false);
-		WebUtil.forward(request, response, "/WEB-INF/views/board/writeform.jsp");
+		
+		BoardDao dao = new BoardDao();
+		int no = Integer.parseInt(request.getParameter("no"));
+		String title = request.getParameter("title");
+		String content = request.getParameter("content");
+		BoardVo vo = new BoardVo();
+		vo.setNo((long)no);
+		vo.setTitle(title);
+		vo.setContent(content);
+		
+		dao.updateBoard(vo);
+		WebUtil.redirect(request, response, "/mysite/board?a=view&no="+no);
 	}
 
 }

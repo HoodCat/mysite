@@ -10,7 +10,7 @@ import javax.servlet.http.HttpSession;
 import com.cafe24.mvc.action.Action;
 import com.cafe24.mvc.util.WebUtil;
 
-public class WriteFormAction implements Action {
+public class ReplyFormAction implements Action {
 
 	@Override
 	public void execute(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -19,7 +19,8 @@ public class WriteFormAction implements Action {
 			WebUtil.redirect(request, response, "/mysite/board");
 			return;
 		}
-		request.setAttribute("isReply", false);
+		
+		request.setAttribute("isReply", true);
 		WebUtil.forward(request, response, "/WEB-INF/views/board/writeform.jsp");
 	}
 
