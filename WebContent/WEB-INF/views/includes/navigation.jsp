@@ -10,22 +10,22 @@
     <c:when test='${param.menu == "main"}'>
         <li class="selected"><a href="/mysite/main">박정제</a></li>
         <li><a href="/mysite/guestbook?a=list">방명록</a></li>
-        <li><a href="/mysite/board">게시판</a></li>
+        <li><a href="/mysite/board?page=1">게시판</a></li>
     </c:when>
     <c:when test='${param.menu == "guestbook" }'>
         <li><a href="/mysite/main">박정제</a></li>
         <li class="selected"><a href="/mysite/guestbook?a=list">방명록</a></li>
-        <li><a href="/mysite/board">게시판</a></li>
+        <li><a href="/mysite/board?page=1">게시판</a></li>
     </c:when>
     <c:when test='${param.menu == "board" }'>
         <li><a href="/mysite/main">박정제</a></li>
         <li><a href="/mysite/guestbook?a=list">방명록</a></li>
-        <li class="selected"><a href="/mysite/board">게시판</a></li>
+        <li class="selected"><a href="/mysite/board?page=1">게시판</a></li>
     </c:when>
     <c:otherwise>
         <li><a href="/mysite/main">박정제</a></li>
         <li><a href="/mysite/guestbook?a=list">방명록</a></li>
-        <li><a href="/mysite/board">게시판</a></li>
+        <li><a href="/mysite/board?page=1">게시판</a></li>
     </c:otherwise>
     </c:choose>
     </ul>

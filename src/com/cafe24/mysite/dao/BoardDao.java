@@ -14,7 +14,36 @@ import com.cafe24.mysite.vo.BoardVo;
 import com.cafe24.mysite.vo.UserVo;
 
 public class BoardDao {
-	private static final int LIST_PAGE_SIZE = 1000;
+	private static final int LIST_PAGE_SIZE = 10;
+	public static final long startPage = 1;
+	private static long endPage = 1;
+	private static long currentPage = 1;
+	
+	public static long getEndPage() {
+		return endPage;
+	}
+
+	public static void setEndPage(long endPage) {
+		BoardDao.endPage = endPage;
+	}
+
+	public static long getCurrentPage() {
+		return currentPage;
+	}
+
+	public static void setCurrentPage(long currentPage) {
+		if(currentPage >= endPage) {
+			BoardDao.currentPage = endPage;
+			return;
+		}
+		
+		if(currentPage <= startPage) {
+			BoardDao.currentPage = startPage;
+			return;
+		}
+		BoardDao.currentPage = currentPage;
+		return;
+	}
 
 	private Connection getConnection() throws SQLException {
 		Connection conn = null;
@@ -105,6 +134,94 @@ public class BoardDao {
 		}
 
 		return max;
+	}
+	
+	public long getTotalCount() {
+		long result = 0L;
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+
+		try {
+			conn = getConnection();
+			String sql = "select count(*) from board";
+			pstmt = conn.prepareStatement(sql);
+
+			rs = pstmt.executeQuery();
+			if(rs.next()) {
+				result = rs.getLong(1);
+			} 
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (rs != null & !rs.isClosed()) {
+					rs.close();
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			try {
+				if (pstmt != null & !pstmt.isClosed()) {
+					pstmt.close();
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			try {
+				if (conn != null & !conn.isClosed()) {
+					conn.close();
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return result;
+	}
+	
+	private long getTotalCount(String kwd) {
+		long result = 0L;
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+
+		try {
+			conn = getConnection();
+			String sql = "select count(*) from board where title like ?";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, "%"+kwd+"%");
+			rs = pstmt.executeQuery();
+			if(rs.next()) {
+				rs.getLong(1);
+			} 
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (rs != null & !rs.isClosed()) {
+					rs.close();
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			try {
+				if (pstmt != null & !pstmt.isClosed()) {
+					pstmt.close();
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			try {
+				if (conn != null & !conn.isClosed()) {
+					conn.close();
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return result;
 	}
 
 	public boolean insert(BoardVo vo) {
@@ -245,7 +362,11 @@ public class BoardDao {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
-
+		long totCount = getTotalCount();
+		endPage = (totCount%LIST_PAGE_SIZE==0)?
+				  (totCount/LIST_PAGE_SIZE):
+				  (totCount/LIST_PAGE_SIZE+1);
+				  
 		try {
 			conn = getConnection();
 			String sql = "select " + "board.no, " + "title, " + "content, " + "group_no, " + "order_no, " + "depth, "
@@ -255,6 +376,76 @@ public class BoardDao {
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setInt(1, LIST_PAGE_SIZE * (page - 1));
 			pstmt.setInt(2, LIST_PAGE_SIZE);
+
+			rs = pstmt.executeQuery();
+			while (rs.next()) {
+				Long no = rs.getLong(1);
+				String title = rs.getString(2);
+				String content = rs.getString(3);
+				Long groupNo = rs.getLong(4);
+				Long orderNo = rs.getLong(5);
+				Long depth = rs.getLong(6);
+				String regDate = rs.getString(7);
+				Long views = rs.getLong(8);
+				Long userNo = rs.getLong(9);
+
+				BoardVo vo = new BoardVo(no, title, content, groupNo, orderNo, depth, regDate, views, userNo);
+				String name = rs.getString(10);
+				Map<String, BoardVo> map = new HashMap<>();
+				map.put(name, vo);
+				result.add(map);
+				// result.put(vo, name);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (rs != null & !rs.isClosed()) {
+					rs.close();
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			try {
+				if (pstmt != null & !pstmt.isClosed()) {
+					pstmt.close();
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			try {
+				if (conn != null & !conn.isClosed()) {
+					conn.close();
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return result;
+	}
+	
+	public List<Map<String, BoardVo>> getList(int page, String kwd) {
+		List<Map<String, BoardVo>> result = new ArrayList<>();
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		long totCount = getTotalCount(kwd);
+		endPage = (totCount%LIST_PAGE_SIZE==0)?
+				  (totCount/LIST_PAGE_SIZE):
+				  (totCount/LIST_PAGE_SIZE+1);
+				  
+		try {
+			conn = getConnection();
+			String sql = "select board.no, title, content, group_no, order_no, depth, reg_date, views, user_no, name "
+					   + "from board "
+					   + "inner join `user` on user_no = `user`.no "
+					   + "where title like ? "
+					   + "order by group_no desc, order_no asc "
+					   + "limit ?, ?";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, "%"+kwd+"%");
+			pstmt.setInt(2, LIST_PAGE_SIZE * (page - 1));
+			pstmt.setInt(3, LIST_PAGE_SIZE);
 
 			rs = pstmt.executeQuery();
 			while (rs.next()) {
@@ -358,5 +549,42 @@ public class BoardDao {
 			}
 		}
 		return result;
+	}
+	
+	public boolean updateViews(BoardVo vo) {
+		boolean result = false;
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+
+		try {
+			conn = getConnection();
+			String sql = "update board set views=views+1 where no=?";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setLong(1, vo.getNo());
+
+			int count = pstmt.executeUpdate();
+			result = (count == 1);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (pstmt != null & !pstmt.isClosed()) {
+					pstmt.close();
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			try {
+				if (conn != null & !conn.isClosed()) {
+					conn.close();
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return result;
+	}
+	public boolean updateViews(long no) {
+		return updateViews(new BoardVo(no, null, null, null, null, null, null, null, null));
 	}
 }

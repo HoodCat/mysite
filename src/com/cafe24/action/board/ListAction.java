@@ -18,8 +18,17 @@ public class ListAction implements Action {
 	@Override
 	public void execute(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		BoardDao dao = new BoardDao();
-		List<Map<String, BoardVo>> mapList = dao.getList(1);
+		int page = 1;
+		String pageStr = request.getParameter("page");
+		if(pageStr != null && !"".equals(pageStr)) {
+			page = Integer.parseInt(pageStr);
+		}
+		BoardDao.setCurrentPage((long)page);
+		List<Map<String, BoardVo>> mapList = dao.getList(page);
+		request.setAttribute("totCount", dao.getTotalCount());
 		request.setAttribute("mapList", mapList);
+		request.setAttribute("endPage", BoardDao.getEndPage());
+		request.setAttribute("curPage", BoardDao.getCurrentPage());
 		WebUtil.forward(request, response, "/WEB-INF/views/board/list.jsp");
 	}
 

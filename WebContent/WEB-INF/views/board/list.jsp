@@ -3,6 +3,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -16,9 +17,10 @@
 		<c:import url="/WEB-INF/views/includes/header.jsp" />
 		<div id="content">
 			<div id="board">
-				<form id="search_form" action="" method="post">
-					<input type="text" id="kwd" name="kwd" value=""> <input
-						type="submit" value="찾기">
+				<form id="search_form" action="/mysite/board" method="post">
+				    <input type="hidden" name="a" value="list"/>
+					<input type="text" id="kwd" name="kwd" value="공|사|중 <^^" readonly>
+                    <input type="submit" value="찾기">
 				</form>
 				<table class="tbl-ex">
 					<tr>
@@ -33,18 +35,18 @@
 					<c:forEach items="${mapList}" var="entrys" varStatus="status">
 						<c:forEach items="${entrys}" var="entry">
 							<tr>
-								<td>${status.index}</td>
+								<td>${totCount - (curPage-1)*10 - status.index}</td>
 								<c:choose>
 									<c:when test="${entry.value.depth > 0}">
 										<td
-											style="text-align:left; padding-left:${30*(entry.value.depth-1)}">
+											style="text-align:left; padding-left:${20*(entry.value.depth-1)}">
 											<img src="/mysite/assets/images/reply.png" /> <a
-											href="/mysite/board?a=view&no=${entry.value.no}">${entry.value.title}</a>
+											href="/mysite/board?a=view&no=${entry.value.no}&page=${curPage}">${entry.value.title}</a>
 										</td>
 									</c:when>
 									<c:otherwise>
 										<td style="text-align: left"><a
-											href="/mysite/board?a=view&no=${entry.value.no}">${entry.value.title}</a>
+											href="/mysite/board?a=view&no=${entry.value.no}&page=${curPage}">${entry.value.title}</a>
 										</td>
 									</c:otherwise>
 								</c:choose>
@@ -62,13 +64,23 @@
 				</table>
 				<div class="pager">
 					<ul>
-						<li><a href="">◀</a></li>
-						<li><a href="">1</a></li>
-						<li><a href="">2</a></li>
-						<li class="selected">3</li>
-						<li><a href="">4</a></li>
-						<li>5</li>
-						<li><a href="">▶</a></li>
+					<c:if test="${curPage != 1}">
+						<li><a href="/mysite/board?page=${(curPage-1)<1?1:(curPage-1)}">◀</a></li>					
+					</c:if>
+						<fmt:parseNumber var="sPage" value="${(curPage-1)/10}" integerOnly="true"/>
+						<c:forEach begin="${sPage*10 + 1}" end="${(sPage*10 + 10)<=endPage?(sPage*10 + 10):endPage}" var="page">
+						    <c:choose>
+						        <c:when test="${page == curPage}">
+									<li class="selected">${page}</li>						        
+						        </c:when>
+						        <c:otherwise>
+									<li><a href="/mysite/board?page=${page}">${page}</a></li>						        
+						        </c:otherwise>
+						    </c:choose>
+						</c:forEach>
+						<c:if test="${curPage != endPage}">
+							<li><a href="/mysite/board?page=${(curPage+1)>endPage?endPage:(curPage+1)}">▶</a></li>
+						</c:if>
 					</ul>
 				</div>
 				<c:if test="${not empty authUser}">
