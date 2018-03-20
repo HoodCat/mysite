@@ -38,7 +38,7 @@
 				<div class="bottom">
 					<a href="/mysite/board?page=${page}">글목록</a>
 					<c:if test="${not empty authUser and authUser.no == vo.userNo}">
-						<a href="/mysite/board?a=modifyform&no=${vo.no}">글수정</a>
+						<a href="/mysite/board?a=modifyform&no=${vo.no}&page=${param.page}">글수정</a>
 					</c:if>
 					<c:if test="${not empty authUser}">
 						<a href="/mysite/board?a=replyform&no=${vo.no}">답글</a>

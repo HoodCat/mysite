@@ -115,6 +115,40 @@ public class CommentDao {
 		return result;
 	}
 	
+	public boolean deleteToBoardNo(long no) {
+		boolean result = false;
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+
+		try {
+			conn = getConnection();
+			String sql = "delete from comment where board_no=?";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setLong(1, no);
+
+			int count = pstmt.executeUpdate();
+			result = (count == 1);
+		} catch (SQLException e) {
+
+		} finally {
+			try {
+				if (pstmt != null & !pstmt.isClosed()) {
+					pstmt.close();
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			try {
+				if (conn != null & !conn.isClosed()) {
+					conn.close();
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return result;
+	}
+	
 	public boolean delete(long no) {
 		return delete(new CommentVo(no, null, null, null, null));
 	}

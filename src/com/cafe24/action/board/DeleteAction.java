@@ -10,6 +10,7 @@ import javax.servlet.http.HttpSession;
 import com.cafe24.mvc.action.Action;
 import com.cafe24.mvc.util.WebUtil;
 import com.cafe24.mysite.dao.BoardDao;
+import com.cafe24.mysite.dao.CommentDao;
 import com.cafe24.mysite.vo.BoardVo;
 
 public class DeleteAction implements Action {
@@ -22,9 +23,10 @@ public class DeleteAction implements Action {
 			return;
 		}
 		
+		int no = Integer.parseInt(request.getParameter("no"));
+		new CommentDao().deleteToBoardNo((long)no);
 		BoardDao dao = new BoardDao();
 		BoardVo vo = new BoardVo();
-		int no = Integer.parseInt(request.getParameter("no"));
 		vo.setNo((long)no);
 		dao.delete(vo);
 		WebUtil.redirect(request, response, "/mysite/board");

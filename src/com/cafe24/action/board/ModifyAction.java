@@ -24,6 +24,7 @@ public class ModifyAction implements Action {
 		
 		BoardDao dao = new BoardDao();
 		int no = Integer.parseInt(request.getParameter("no"));
+		int page = Integer.parseInt(request.getParameter("page"));
 		String title = request.getParameter("title");
 		String content = request.getParameter("content");
 		BoardVo vo = new BoardVo();
@@ -32,7 +33,7 @@ public class ModifyAction implements Action {
 		vo.setContent(content);
 		
 		dao.updateBoard(vo);
-		WebUtil.redirect(request, response, "/mysite/board?a=view&no="+no);
+		WebUtil.redirect(request, response, "/mysite/board?a=view&no="+no+"&page="+page);
 	}
 
 }

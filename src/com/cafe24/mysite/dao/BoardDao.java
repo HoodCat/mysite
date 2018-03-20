@@ -366,6 +366,10 @@ public class BoardDao {
 		endPage = (totCount%LIST_PAGE_SIZE==0)?
 				  (totCount/LIST_PAGE_SIZE):
 				  (totCount/LIST_PAGE_SIZE+1);
+		endPage = (endPage==0)?1:endPage;
+		
+		System.out.println(currentPage);
+		System.out.println(endPage);
 				  
 		try {
 			conn = getConnection();
